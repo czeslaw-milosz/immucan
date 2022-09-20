@@ -14,11 +14,13 @@ from immucan.utils.config import CONFIG
 
 class TiffSequence(tf.keras.utils.Sequence):
 
-    def __init__(self, img_dir: str, batch_size: int, shuffle: bool = True, augment: bool = True,
-                 y_mode: str = "full_image") -> None:
+    def __init__(self, img_dir: str, batch_size: int, training_channels: List[int], validation_channels: List[int],
+                 shuffle: bool = True, augment: bool = True, y_mode: str = "full_image") -> None:
         self.img_dir = img_dir
         self.img_list = sorted([os.path.join(img_dir, file_name) for file_name in os.listdir(img_dir)])
         self.batch_size = batch_size
+        self.training_channels = training_channels
+        self.validation_channels = validation_channels
         self.shuffle = shuffle
         self.augment = augment
         self.augmentations = A.Compose([
@@ -30,7 +32,7 @@ class TiffSequence(tf.keras.utils.Sequence):
         self.y_mode = y_mode
 
     def __len__(self) -> int:
-        """Returns the number of full batches per epoch. One last 'incomplete' batch may not be seen during training."""
+        """Returns the number of batches per epoch."""
         return np.ceil(len(self.img_list) / self.batch_size).astype(int)
         # return len(self.img_list) % self.batch_size
 
@@ -45,8 +47,13 @@ class TiffSequence(tf.keras.utils.Sequence):
                 self.augmentations(image=image)['image']
                 for image in batch_imgs
             ])
-        x, y = (batch_imgs, batch_imgs) if self.y_mode == "full_image" \
-            else (batch_imgs, np.array([self._get_central_pixel(subarray) for subarray in batch_imgs]))
+        x, y = (
+            batch_imgs[:, :, :, self.training_channels],
+            batch_imgs[:, :, :, self.validation_channels]
+        ) if self.y_mode == "full_image" else (
+            batch_imgs[:, :, :, self.training_channels],
+            np.array([self._get_central_pixel(subarray) for subarray in batch_imgs])[:, :, :, self.validation_channels]
+        )
         return x, y
 
     @staticmethod
@@ -76,6 +83,9 @@ class PanelMetadata:
             value: key for key, value in self.index_to_marker_name.items()
         }
         self.marker_names = list(self.marker_name_to_index.keys())
+
+    def get_channel_idx(self, channel_names: List[str]) -> List[int]:
+        return [self.marker_name_to_index[key] for key in channel_names]
 
 
 def preprocess_tiff(tiff_img: np.ndarray) -> np.ndarray:
