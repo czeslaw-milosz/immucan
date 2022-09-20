@@ -14,13 +14,13 @@ from immucan.utils.config import CONFIG
 
 class TiffSequence(tf.keras.utils.Sequence):
 
-    def __init__(self, img_dir: str, batch_size: int, training_channels: List[int], validation_channels: List[int],
+    def __init__(self, img_dir: str, batch_size: int, training_channels: List[int], predicted_channels: List[int],
                  shuffle: bool = True, augment: bool = True, y_mode: str = "full_image") -> None:
         self.img_dir = img_dir
         self.img_list = sorted([os.path.join(img_dir, file_name) for file_name in os.listdir(img_dir)])
         self.batch_size = batch_size
         self.training_channels = training_channels
-        self.validation_channels = validation_channels
+        self.predicted_channels = predicted_channels
         self.shuffle = shuffle
         self.augment = augment
         self.augmentations = A.Compose([
@@ -49,10 +49,10 @@ class TiffSequence(tf.keras.utils.Sequence):
             ])
         x, y = (
             batch_imgs[:, :, :, self.training_channels],
-            batch_imgs[:, :, :, self.validation_channels]
+            batch_imgs[:, :, :, self.predicted_channels]
         ) if self.y_mode == "full_image" else (
             batch_imgs[:, :, :, self.training_channels],
-            np.array([self._get_central_pixel(subarray) for subarray in batch_imgs])[:, :, :, self.validation_channels]
+            np.array([self._get_central_pixel(subarray) for subarray in batch_imgs])[:, :, :, self.predicted_channels]
         )
         return x, y
 

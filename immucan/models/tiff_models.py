@@ -2,8 +2,8 @@ from tensorflow import keras
 from keras import layers
 
 
-def get_model(train_size: int, val_size: int, use_batch_norm: bool = False):
-    inputs = keras.Input(shape=train_size)  # expected img size (300, 300, 40)
+def get_model(train_img_shape: int, val_img_shape: int, use_batch_norm: bool = False):
+    inputs = keras.Input(shape=train_img_shape)  # expected img size (300, 300, 40)
 
     # Entry block
     x = layers.Conv2D(filters=32, kernel_size=3, padding="same")(inputs)
@@ -46,7 +46,7 @@ def get_model(train_size: int, val_size: int, use_batch_norm: bool = False):
     if use_batch_norm:
         x = layers.BatchNormalization()(x)
 
-    x = layers.Conv2D(val_size[-1], 3, padding="valid")(x)
+    x = layers.Conv2D(val_img_shape[-1], 3, padding="valid")(x)
     outputs = layers.UpSampling2D(2)(x)
 
     # Define the model
