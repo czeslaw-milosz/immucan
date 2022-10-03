@@ -10,4 +10,5 @@ CONFIG = {
                            'CD209', 'CD66b', 'CD11b', 'NKG2A', 'CD56', 'BCL-2', 'CXCL13 / BLC / BCA-1', 'Eomes',
                            '4-1BB', 'Tbet', 'GITR / TNFRSF18', 'panCK', 'EGFR', 'p53', 'CD73', 'CD155', 'Gata3',
                            'CD134'],
+    'layer_sizes': [64, 128],
 }

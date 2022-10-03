@@ -1,8 +1,12 @@
+from typing import Tuple
+
 from tensorflow import keras
 from keras import layers
 
+from immucan.utils.config import CONFIG
 
-def get_model(train_img_shape: int, val_img_shape: int, use_batch_norm: bool = False):
+
+def get_model(train_img_shape: Tuple[int, int, int], val_img_shape: Tuple[int, int, int], use_batch_norm: bool = False):
     inputs = keras.Input(shape=train_img_shape)  # expected img size (300, 300, 40)
 
     # Entry block
@@ -16,7 +20,7 @@ def get_model(train_img_shape: int, val_img_shape: int, use_batch_norm: bool = F
     x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
 
     # Blocks 1, 2 are identical apart from the feature depth.
-    for filters in [64, 128]:
+    for filters in CONFIG['layer_sizes']:
         x = layers.Activation("relu")(x)
         x = layers.Conv2D(filters, 3, padding="same")(x)
         if use_batch_norm:
