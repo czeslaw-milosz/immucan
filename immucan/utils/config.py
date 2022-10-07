@@ -2,6 +2,7 @@ CONFIG = {
     'experiment_name': 'baseline',
     'result_dir': '../../models/reconstruction',
     'metadata_path': '../../../immucan_old/workflow_samples/IMC/csv/10061074/panel_metadata.csv',
+    'dataset_dir': '../../data/imc_quadrants',
     # 'model_checkpoint_path': '../models/reconstruction/experiment_3',
     # 'training_plot_path': '../models/reconstruction/plots/experiment_3.png',
     'preprocessing_threshold': 100,
