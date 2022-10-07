@@ -69,5 +69,5 @@ if __name__ == '__main__':
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
-    plot_filename = os.path.join(CONFIG['result_dir'], 'plots', f"{CONFIG['model_name']}.png")
+    plot_filename = os.path.join(CONFIG['result_dir'], 'plots', f"{CONFIG['experiment_name']}.png")
     plt.savefig(plot_filename)
