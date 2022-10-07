@@ -1,6 +1,7 @@
 import datetime
 
 import numpy as np
+import os
 import tensorflow as tf
 from matplotlib import pyplot as plt
 
@@ -44,6 +45,7 @@ if __name__ == '__main__':
 
     start = datetime.datetime.now()
     print(f"STARTED TRAINING: {start}\n")
+    checkpoint_path = os.path.join(CONFIG['result_dir'], CONFIG['experiment_name'])
     history = model.fit(
         training_gen,
         epochs=CONFIG['n_epochs'],
@@ -52,7 +54,7 @@ if __name__ == '__main__':
         use_multiprocessing=True,
         workers=3,
         callbacks=[
-            tf.keras.callbacks.ModelCheckpoint(CONFIG['model_checkpoint_path'], save_best_only=True),
+            tf.keras.callbacks.ModelCheckpoint(checkpoint_path, save_best_only=True),
             tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=CONFIG['early_stopping_patience']),
         ]
     )
@@ -67,4 +69,5 @@ if __name__ == '__main__':
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
-    plt.savefig(CONFIG['training_plot_path'])
+    plot_filename = os.path.join(CONFIG['result_dir'], 'plots', f"{CONFIG['model_name']}.png")
+    plt.savefig(plot_filename)
