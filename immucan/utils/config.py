@@ -1,9 +1,9 @@
 CONFIG = {
     'experiment_name': 'baseline',
-    'result_dir': '../models/reconstruction',
-    'metadata_path': '../../immucan_old/workflow_samples/IMC/csv/10061074/panel_metadata.csv',
-    'model_checkpoint_path': '../models/reconstruction/experiment_3',
-    'training_plot_path': '../models/reconstruction/plots/experiment_3.png',
+    'result_dir': '../../models/reconstruction',
+    'metadata_path': '../../../immucan_old/workflow_samples/IMC/csv/10061074/panel_metadata.csv',
+    # 'model_checkpoint_path': '../models/reconstruction/experiment_3',
+    # 'training_plot_path': '../models/reconstruction/plots/experiment_3.png',
     'preprocessing_threshold': 100,
     'training_modes': (
         'full_image',
