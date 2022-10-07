@@ -1,7 +1,7 @@
 CONFIG = {
     'metadata_path': '../../immucan_old/workflow_samples/IMC/csv/10061074/panel_metadata.csv',
-    'model_checkpoint_path': '../models/reconstruction/baseline',
-    'training_plot_path': '../models/reconstruction/plots/baseline.png',
+    'model_checkpoint_path': '../models/reconstruction/experiment_3',
+    'training_plot_path': '../models/reconstruction/plots/experiment_3.png',
     'preprocessing_threshold': 100,
     'training_modes': (
         'full_image',
@@ -15,12 +15,12 @@ CONFIG = {
                            '4-1BB', 'Tbet', 'GITR / TNFRSF18', 'panCK', 'EGFR', 'p53', 'CD73', 'CD155', 'Gata3',
                            'CD134'],
     'loss': 'mse',
-    'layer_sizes': (64, 128),
+    'layer_sizes': (64, 128, 256),
     'batch_size': 32,
     'learning_rate': 0.001,
     'clip_norm': 1.0,
     'use_batch_norm': True,
     'n_epochs': 100,
-    'early_stopping_patience': 15,
+    'early_stopping_patience': 1000,
     'random_seed': 2137,
 }

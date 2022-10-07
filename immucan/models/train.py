@@ -36,8 +36,8 @@ if __name__ == '__main__':
     )
     print(model.summary())
 
-    optimizer = tf.keras.optimizers.Adam(CONFIG['learning_rate'], clipnorm=CONFIG['clipnorm']) \
-        if CONFIG['clipnorm'] \
+    optimizer = tf.keras.optimizers.Adam(CONFIG['learning_rate'], clipnorm=CONFIG['clip_norm']) \
+        if CONFIG['clip_norm'] \
         else tf.keras.optimizers.Adam(CONFIG['learning_rate'])
     model.compile(optimizer=optimizer, loss=CONFIG['loss'])
 
@@ -65,4 +65,4 @@ if __name__ == '__main__':
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'val'], loc='upper left')
-    plt.imsave(CONFIG['training_plot_path'])
+    plt.savefig(CONFIG['training_plot_path'])
