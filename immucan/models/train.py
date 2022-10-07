@@ -1,5 +1,6 @@
 import datetime
 
+import numpy as np
 import tensorflow as tf
 from matplotlib import pyplot as plt
 
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     stop = datetime.datetime.now()
     print(f"STOPPED TRAINING: {stop}")
     print(f"TOTAL TRAINING TIME: {stop - start}")
+    print(f"BEST VALIDATION LOSS: {np.min(history.history['val_loss'])}")
 
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
