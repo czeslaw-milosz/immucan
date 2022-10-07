@@ -23,6 +23,7 @@ CONFIG = {
     'learning_rate': 0.001,
     'clip_norm': 1.0,
     'use_batch_norm': True,
+    'use_residual_connections': False,
     'n_epochs': 100,
     'early_stopping_patience': 1000,
     'random_seed': 2137,

@@ -5,7 +5,7 @@ from keras import layers
 
 
 def get_model(train_img_shape: Tuple[int, int, int], val_img_shape: Tuple[int, int, int], use_batch_norm: bool = False,
-              layer_sizes: Tuple[int] = (64, 128)):
+              layer_sizes: Tuple[int] = (64, 128), residual_connections: bool = False):
     inputs = keras.Input(shape=train_img_shape)  # expected training img shape: (300, 300, n_training_channels)
 
     # Entry block
@@ -17,6 +17,9 @@ def get_model(train_img_shape: Tuple[int, int, int], val_img_shape: Tuple[int, i
     if use_batch_norm:
         x = layers.BatchNormalization()(x)
     x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
+
+    if residual_connections:
+        previous_block_activation = x  # Set aside residual
 
     # Body of the network
     for n_filters in layer_sizes:
@@ -30,6 +33,12 @@ def get_model(train_img_shape: Tuple[int, int, int], val_img_shape: Tuple[int, i
             x = layers.BatchNormalization()(x)
         x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
 
+        if residual_connections:
+            # Project residual
+            residual = layers.Conv2D(n_filters, 1, strides=2, padding="same")(previous_block_activation)
+            x = layers.add([x, residual])  # Add back residual
+            previous_block_activation = x  # Set aside next residual
+
     # Second half of the network: upsampling inputs
     for n_filters in reversed(layer_sizes):
         x = layers.Activation("relu")(x)
@@ -41,6 +50,13 @@ def get_model(train_img_shape: Tuple[int, int, int], val_img_shape: Tuple[int, i
         if use_batch_norm:
             x = layers.BatchNormalization()(x)
         x = layers.UpSampling2D(2)(x)
+
+        if residual_connections:
+            # Project residual
+            residual = layers.UpSampling2D(2)(previous_block_activation)
+            residual = layers.Conv2D(n_filters, 1, padding="same")(residual)
+            x = layers.add([x, residual])  # Add back residual
+            previous_block_activation = x  # Set aside next residual
 
     x = layers.Activation("relu")(x)
     x = layers.Conv2DTranspose(32, 3, padding="same")(x)

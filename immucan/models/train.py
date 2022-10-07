@@ -34,7 +34,8 @@ if __name__ == '__main__':
         train_img_shape=(img_height, img_width, len(training_channels)),
         val_img_shape=(img_height, img_width, len(predicted_channels)),
         use_batch_norm=CONFIG['use_batch_norm'],
-        layer_sizes=CONFIG['layer_sizes']
+        layer_sizes=CONFIG['layer_sizes'],
+        residual_connections=CONFIG['use_residual_connections']
     )
     print(model.summary())
 
