@@ -22,11 +22,13 @@ if __name__ == '__main__':
     training_gen = data_utils.TiffSequence(os.path.join(CONFIG['dataset_dir'], 'training'),
                                            training_channels=training_channels,
                                            predicted_channels=predicted_channels,
-                                           batch_size=CONFIG['batch_size'])
+                                           batch_size=CONFIG['batch_size'],
+                                           save_memory=CONFIG['save_memory'])
     validation_gen = data_utils.TiffSequence(os.path.join(CONFIG['dataset_dir'], 'validation'),
                                              training_channels=training_channels,
                                              predicted_channels=predicted_channels,
-                                             batch_size=CONFIG['batch_size'])
+                                             batch_size=CONFIG['batch_size'],
+                                             save_memory=CONFIG['save_memory'])
 
     img_height, img_width = CONFIG['img_shape']
     tf.keras.backend.clear_session()

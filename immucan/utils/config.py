@@ -26,5 +26,6 @@ CONFIG = {
     'use_residual_connections': False,
     'n_epochs': 100,
     'early_stopping_patience': 1000,
+    'save_memory': True,
     'random_seed': 2137,
 }
