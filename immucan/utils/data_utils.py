@@ -8,6 +8,7 @@ import pandas as pd
 import tensorflow as tf
 import tifffile
 from steinbock.preprocessing import imc as steinbock_imc
+from tqdm import tqdm
 
 from immucan.utils.config import CONFIG
 
@@ -15,9 +16,16 @@ from immucan.utils.config import CONFIG
 class TiffSequence(tf.keras.utils.Sequence):
 
     def __init__(self, img_dir: str, batch_size: int, training_channels: List[int], predicted_channels: List[int],
-                 shuffle: bool = True, augment: bool = True, y_mode: str = "full_image") -> None:
+                 shuffle: bool = True, augment: bool = True, y_mode: str = "full_image",
+                 save_memory: bool = True) -> None:
         self.img_dir = img_dir
         self.img_list = sorted([os.path.join(img_dir, file_name) for file_name in os.listdir(img_dir)])
+        self.save_memory = save_memory
+        if self.save_memory:
+            print("Memory-hungry mode on; reading images...")
+            self.imgs = [
+                np.moveaxis(preprocess_tiff(tifffile.imread(file_name)), 0, 2)
+                for file_name in tqdm(self.img_list)]
         self.batch_size = batch_size
         self.training_channels = training_channels
         self.predicted_channels = predicted_channels
@@ -39,9 +47,13 @@ class TiffSequence(tf.keras.utils.Sequence):
     def __getitem__(self, idx) -> Tuple[np.ndarray, np.ndarray]:
         """Output shape: (batch_size, height, width, n_channels)."""
         batch_filenames = self.img_list[idx*self.batch_size:(idx+1)*self.batch_size]
-        batch_imgs = np.array([
-            np.moveaxis(preprocess_tiff(tifffile.imread(file_name)), 0, 2)
-            for file_name in batch_filenames])  # (batch_size, height, width, n_channels)
+        if self.save_memory:
+            batch_imgs = np.array([
+                np.moveaxis(preprocess_tiff(tifffile.imread(file_name)), 0, 2)
+                for file_name in batch_filenames
+            ])  # (batch_size, height, width, n_channels)
+        else:
+            batch_imgs = np.array(self.imgs[idx*self.batch_size:(idx+1)*self.batch_size])
         if self.augment:
             batch_imgs = np.array([
                 self.augmentations(image=image)['image']
