@@ -18,15 +18,21 @@ if __name__ == '__main__':
 
     training_channels = metadata_manager.get_channel_idx(CONFIG['training_channels'])
     predicted_channels = [i for i in range(len(metadata_manager.marker_names)) if i not in training_channels]
+    training_channels_names = metadata_manager.get_channel_names(training_channels)
+    predicted_channels_names = metadata_manager.get_channel_names(predicted_channels)
 
     training_gen = data_utils.TiffSequence(os.path.join(CONFIG['dataset_dir'], 'training'),
                                            training_channels=training_channels,
                                            predicted_channels=predicted_channels,
+                                           training_channels_names=training_channels_names,
+                                           predicted_channels_names=predicted_channels_names,
                                            batch_size=CONFIG['batch_size'],
                                            save_memory=CONFIG['save_memory'])
     validation_gen = data_utils.TiffSequence(os.path.join(CONFIG['dataset_dir'], 'validation'),
                                              training_channels=training_channels,
                                              predicted_channels=predicted_channels,
+                                             training_channels_names=training_channels_names,
+                                             predicted_channels_names=predicted_channels_names,
                                              batch_size=CONFIG['batch_size'],
                                              save_memory=CONFIG['save_memory'])
 

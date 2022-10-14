@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import albumentations as A
 import numpy as np
@@ -15,13 +15,14 @@ from immucan.utils.config import CONFIG
 
 class TiffSequence(tf.keras.utils.Sequence):
 
-    def __init__(self, img_dir: str, batch_size: int, training_channels: List[int], predicted_channels: List[int],
-                 shuffle: bool = True, augment: bool = True, y_mode: str = "full_image",
-                 save_memory: bool = True) -> None:
+    def __init__(self, img_dir: str, batch_size: int, training_channels: List[int],
+                 predicted_channels: List[int], training_channels_names: Optional[List[str]] = None,
+                 predicted_channels_names: Optional[List[str]] = None, shuffle: bool = True, augment: bool = True,
+                 y_mode: str = "full_image", save_memory: bool = True) -> None:
         self.img_dir = img_dir
         self.img_list = sorted([os.path.join(img_dir, file_name) for file_name in os.listdir(img_dir)])
         self.save_memory = save_memory
-        if self.save_memory:
+        if not self.save_memory:
             print("Memory-hungry mode on; reading images...")
             self.imgs = [
                 np.moveaxis(preprocess_tiff(tifffile.imread(file_name)), 0, 2)
@@ -29,6 +30,8 @@ class TiffSequence(tf.keras.utils.Sequence):
         self.batch_size = batch_size
         self.training_channels = training_channels
         self.predicted_channels = predicted_channels
+        self.training_channels_names = training_channels_names
+        self.predicted_channels_names = predicted_channels_names
         self.shuffle = shuffle
         self.augment = augment
         self.augmentations = A.Compose([
@@ -42,7 +45,6 @@ class TiffSequence(tf.keras.utils.Sequence):
     def __len__(self) -> int:
         """Returns the number of batches per epoch."""
         return np.ceil(len(self.img_list) / self.batch_size).astype(int)
-        # return len(self.img_list) % self.batch_size
 
     def __getitem__(self, idx) -> Tuple[np.ndarray, np.ndarray]:
         """Output shape: (batch_size, height, width, n_channels)."""
@@ -99,6 +101,8 @@ class PanelMetadata:
     def get_channel_idx(self, channel_names: List[str]) -> List[int]:
         return [self.marker_name_to_index[key] for key in channel_names]
 
+    def get_channel_names(self, channel_idx: List[int]) -> List[str]:
+        return [self.index_to_marker_name[key] for key in channel_idx]
 
 def preprocess_tiff(tiff_img: np.ndarray) -> np.ndarray:
     return np.arcsinh(steinbock_imc.filter_hot_pixels(tiff_img, CONFIG['preprocessing_threshold']) / 5)
